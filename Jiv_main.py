@@ -6,18 +6,21 @@ import Jiv_logic
 import Jiv_adapter
 import Jiv_gui
 import Jiv_service
+import Jiv_build_config
 
 
 class JIVMain:
     def __init__(self):
         self.app = QApplication(sys.argv)
 
-        self.logic = Jiv_logic.JIVLogic()
+        self.logic = Jiv_logic.JIVLogic(Jiv_build_config)
         self.gui = Jiv_gui.MainWindow()
         self.adapters = Jiv_adapter.AdapterManager(self.logic, self.gui)
         self.gui.adapter_signal_connect(self.adapters)
 
         self.gui.show()
+
+        self.logic.after_ui_launched(self.gui.winId())
 
         self.services = Jiv_service.ServiceManager(self.logic, self.gui)
 
