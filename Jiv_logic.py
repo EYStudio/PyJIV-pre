@@ -174,7 +174,7 @@ class JIVLogic:
             ctypes.windll.user32.SetWindowDisplayAffinity(int(hwnd), 0)
 
     @staticmethod
-    def get_process_state(process_name = 'studentmain.exe'):
+    def get_process_state(process_name='studentmain.exe'):
         if not process_name.lower().endswith(".exe"):
             process_name += ".exe"
 
@@ -258,7 +258,7 @@ class JIVLogic:
                 exe_name = win32process.GetModuleFileNameEx(h_process, 0)
                 if exe_name.lower().endswith(process_name.lower()):
                     return pid
-            except pywintypes.error as err: # type: ignore
+            except pywintypes.error as err:  # type: ignore
                 # Insufficient permissions, permission denied or the process has exited
                 print(f"pywintypes.error for PID {pid}: {err}")
                 continue
@@ -450,12 +450,16 @@ class JIVLogic:
         if self.system_info.get("major") == 10:
             try:
                 hm = win32gui.GetMenu(hwnd)
-                mii,_ = win32gui_struct.EmptyMENUITEMINFO()
-                win32gui.GetMenuItemInfo(hm,0x7704,False,mii)
-                if list(win32gui_struct.UnpackMENUITEMINFO(mii))[1]==0:
-                    win32gui.PostMessage(hwnd,win32con.WM_COMMAND,0x7704,0)
+                mii, _ = win32gui_struct.EmptyMENUITEMINFO()
+                win32gui.GetMenuItemInfo(hm, 0x7704, False, mii)
+                if list(win32gui_struct.UnpackMENUITEMINFO(mii))[1] == 0:
+                    win32gui.PostMessage(hwnd, win32con.WM_COMMAND, 0x7704, 0)
             except PermissionError as err:
-                print(err)
+                print('An error occurred:', err)
+            except pywintypes.error as err:  # type: ignore
+                print('An error occurred:', err)
+                self.set_window_top_most(hwnd)
+
         else:
             self.set_window_top_most(hwnd)
 
@@ -474,4 +478,3 @@ class JIVLogic:
 
 # self.floatwin.setText(
 #     f"窗口标题：{GetWindowText(hwnd)}\n窗口类名：{GetClassName(hwnd)}\n窗口位置：{str(GetWindowRect(hwnd))}\n窗口句柄：{int(hwnd)}\n窗口进程：{procname}")
-
