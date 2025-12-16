@@ -165,7 +165,8 @@ class JIVLogic:
         return None
 
     def after_ui_launched(self, hwnd):
-        self.set_window_display_affinity(hwnd)
+        pass
+        # self.set_window_display_affinity(hwnd)
 
     def set_window_display_affinity(self, hwnd):
         if self.system_info["major"] >= 10 and self.system_info["build"] >= 19041:
