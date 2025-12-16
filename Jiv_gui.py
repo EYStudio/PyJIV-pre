@@ -33,9 +33,12 @@ class MainWindow(QMainWindow):
         # self.adapter = adapter
         self.main_widget.adapter_signal_connect(adapter)
 
+
 class MainWidget(QWidget):
     def __init__(self):
         super().__init__()
+        self.adapter = None
+
         self.BTN_HEIGHT = 32
         self.BTN_WIDTH = int(self.BTN_HEIGHT * 2)
         self.SPACING = 4
@@ -45,6 +48,7 @@ class MainWidget(QWidget):
         self.sidebar = self.sidebar_layout = None
         self.tabs = self.button_group = None
         self.pages = None
+        self.toolkit_page = self.about_page = None
 
         self.init_ui()
 
@@ -110,6 +114,7 @@ class MainWidget(QWidget):
 
         self.sidebar_layout.addWidget(container, alignment=Qt.AlignmentFlag.AlignCenter)
 
+        # Issue in placing sidebar buttons in center
         # self.sidebar_layout.addStretch()
 
         self.sidebar.setFixedHeight(self.SIDEBAR_HEIGHT)
@@ -124,6 +129,10 @@ class MainWidget(QWidget):
 
         # Stack pages
         self.pages = QStackedWidget()
+        self.toolkit_page = ToolkitPage()
+        self.pages.addWidget(self.toolkit_page)
+        self.about_page = UpdatingPage()
+        self.pages.addWidget(self.about_page)
 
         self.button_group.idClicked.connect(self.pages.setCurrentIndex)
 
@@ -134,7 +143,7 @@ class MainWidget(QWidget):
 
     def adapter_signal_connect(self, adapter):
         self.adapter = adapter
-        # self.toolkit_page.adapter_signal_connect(adapter)
+        self.toolkit_page.adapter_signal_connect(adapter)
 
 
 class ToolkitPage(QWidget):
@@ -292,4 +301,3 @@ class UpdatingPage(QWidget):
 
         main_layout.addWidget(self.updating_label)
         self.setLayout(main_layout)
-
