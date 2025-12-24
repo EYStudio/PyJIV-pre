@@ -36,13 +36,7 @@ class ServiceManager:
     def stop_all(self):
         """Stop services and quit"""
         for service, thread in self.threads.items():
-            # print(service, thread)
             service.stop()
-
-            # May cause deadlock
-            # If not daemon, wait until lifelong_threads end
-            # if thread.is_alive():
-            #     thread.join()
 
 
 class BaseServiceInterface(ABC):
@@ -92,17 +86,6 @@ class TopMostService(BaseServiceInterface):
                 print(err)
             if self.stop_flag.wait(self.interval):
                 break
-
-    # def stop(self):
-    #     self.run = False
-    #     print('get stop signal')
-    #
-    # def run_task(self):
-    #     # Set top most
-    #     while self.run:
-    #         print(self.run)
-    #         self.logic.set_window_top_most(self.hwnd)
-    #         time.sleep(self.interval)
 
 
 class HideService(BaseServiceInterface):

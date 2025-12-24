@@ -50,10 +50,8 @@ class AdapterManager(QObject):
         self.run_taskmgr_adapter.change.connect(lambda result, w=self.run_taskmgr_adapter:
                                                  self.ui_change.emit(type(w).__name__, result))
         self.run_taskmgr_adapter.request_top.connect(self.logic.top_taskmgr)
-        # self.run_taskmgr_adapter.request_top.connect(lambda: print('request_top received'))
 
         self.lifelong_objects[self.run_taskmgr_adapter] = thread
-        self.on_demand_objects[self.run_taskmgr_adapter] = thread
 
         thread.start()
 
@@ -79,19 +77,6 @@ class AdapterManager(QObject):
             adapter.deleteLater()
             thread.deleteLater()
 
-    # def pop_ondemand_object(self, adapter):
-    #     if adapter in self.on_demand_objects:
-    #         return self.on_demand_objects.pop(adapter, None)
-    #     # if thread in self.on_demand_objects:
-    #     #     self.on_demand_objects.pop(thread)
-    #     # adapter.deleteLater() and thread.deleteLater()
-    #
-    # def cleanup_on_demand(self, adapter, thread):
-    #     self.pop_ondemand_object(adapter)
-    #     adapter.moveToThread(QApplication.instance().thread())
-    #     # adapter.deleteLater()
-    #     # thread.deleteLater()
-
     def terminate_studentmain(self):
         self.terminate_adapter.start()
 
@@ -107,9 +92,6 @@ class AdapterManager(QObject):
         if self.run_taskmgr_adapter.is_running():
             print("taskmgr adapter already running")
             return
-
-        # call in different threads, causes issue in slot connection in qtimer
-        # self.run_taskmgr_adapter.run_task()
 
         self.run_taskmgr_adapter.trigger_run.emit()
 
@@ -213,8 +195,6 @@ class RunTaskmgrAdapter(QObject):
 
     def __init__(self, logic):
         super().__init__()
-        # self.running = False
-        # self.cnt = 0
         self.running = None
         self.cnt = None
         self.timer = None
@@ -236,7 +216,6 @@ class RunTaskmgrAdapter(QObject):
         self.logic.start_file("taskmgr")
         print("adapter.start called")
         self.timer.start()
-        # print('timer started')
 
     def is_taskmgr_alive(self):
         self.cnt += 1

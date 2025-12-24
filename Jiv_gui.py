@@ -64,7 +64,6 @@ class MainWidget(QWidget):
         self.sidebar_layout = QHBoxLayout(self.sidebar)
         self.sidebar_layout.setContentsMargins(self.SPACING, self.SPACING, self.SPACING, self.SPACING)
         # self.sidebar_layout.setSpacing(self.SPACING)
-        # self.sidebar_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.sidebar_tabs = [
             "Tools",
@@ -87,7 +86,7 @@ class MainWidget(QWidget):
                 background-color: #dcdcdc;
             }}
             QPushButton:pressed {{
-                background-color: #cccccc;
+                background-color: #cbcbcb;
             }}
             QPushButton:checked {{
                 background-color: #4a90e2;
@@ -124,17 +123,6 @@ class MainWidget(QWidget):
         self.sidebar.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
         self.sidebar.setObjectName("sidebar")
-        # self.sidebar.setStyleSheet("""
-        #     #sidebar {
-        #         border-bottom: 1px solid #cccccc;
-        #     }
-        # """)
-        # Test space occupied
-        # self.sidebar.setStyleSheet("""
-        #     #sidebar {
-        #         border: 1px solid #aaaaaa;
-        #     }
-        # """)
 
         self.live_frame = QWidget()
         self.live_frame.setObjectName("live_frame")
@@ -275,7 +263,7 @@ class ToolkitPage(QWidget):
                             background-color: #dedede; 
                         }
                         QPushButton:pressed {
-                            background-color: #dddddd; 
+                            background-color: #cdcdcd; 
                         }
                     """)
             # cec2ff - b3b3f1 - dcb6d5 - cf8ba9 - b15e6c
@@ -358,6 +346,7 @@ class UpdatePage(QWidget):
         super().__init__()
         self.studentmain_state = None
         self.update_state_label = None
+        self.get_update_btn = None
         self.adapter = None
         self.init_ui()
 
@@ -402,7 +391,7 @@ class UpdatePage(QWidget):
                             background-color: #dedede; 
                         }
                         QPushButton:pressed {
-                            background-color: #dddddd; 
+                            background-color: #cdcdcd; 
                         }
                     """)
 
@@ -423,7 +412,6 @@ class UpdatePage(QWidget):
 
     def set_adapter(self, adapter):
         self.adapter = adapter
-        self.current_version = self.adapter.get_current_version()
 
     def get_update(self):
         self.update_state_label.setText(f'Getting updates')

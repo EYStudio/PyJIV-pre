@@ -437,6 +437,8 @@ class JIVLogic:
         current = version.parse(current_version)
         latest = version.parse(latest_version)
 
+        print(f'latest version: {latest_version}')
+
         if latest > current:
             return UpdateState.FIND_LATEST, latest_version
         else:
