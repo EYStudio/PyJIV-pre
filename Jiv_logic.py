@@ -52,6 +52,12 @@ class JIVLogic:
         print(self.studentmain_path)
 
     @staticmethod
+    def check_operate_system():
+        """Check whether OS is Windows nt"""
+        if os.name != 'nt':
+            sys.exit('UNSUPPORTED SYSTEMS')
+
+    @staticmethod
     def is_admin():
         """Checking whether programme has administrator privilege"""
 
