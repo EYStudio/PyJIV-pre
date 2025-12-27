@@ -236,25 +236,52 @@ class JIVLogic:
         else:
             return False
 
-    @staticmethod
-    def get_pid_form_process_name(process_name):
-        """
-        Get the PID of a process by name.
+    # WILL BE DELETED IN NEXT VERSION
+    # @staticmethod
+    # def get_pid_form_process_name(process_name):
+    #     """
+    #     Get the PID of a process by name.
+    #
+    #     Iterates through running processes and compares names.
+    #     :return: PID if found, otherwise None
+    #     """
+    #     pid_list = []
+    #
+    #     if not process_name.lower().endswith(".exe"):
+    #         process_name += ".exe"
+    #     process_iter = psutil.process_iter()
+    #     for proc in process_iter:
+    #         try:
+    #             if proc.name().lower() == process_name.lower():
+    #                 pid_list.append(proc.pid)
+    #         except (psutil.NoSuchProcess, psutil.AccessDenied):
+    #             continue
+    #
+    #     if pid_list:
+    #         return tuple(pid_list)
+    #     else:
+    #         return None
 
-        Iterates through running processes and compares names.
-        :return: PID if found, otherwise None
+    @staticmethod
+    def get_pid_from_process_name(process_name):
+        """
+        Get the PID(s) of a process by name.
+        Returns a tuple of PIDs, or None if not found.
         """
         if not process_name.lower().endswith(".exe"):
             process_name += ".exe"
-        process_iter = psutil.process_iter()
-        for proc in process_iter:
+
+        target = process_name.lower()
+        pid_list = []
+
+        for proc in psutil.process_iter(['pid', 'name']):
             try:
-                if proc.name().lower() == process_name.lower():
-                    return proc.pid
+                if proc.info['name'] and proc.info['name'].lower() == target:
+                    pid_list.append(proc.info['pid'])
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue
 
-        return None
+        return tuple(pid_list) or None
 
     @staticmethod
     def get_pid_by_name(process_name):
