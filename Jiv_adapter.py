@@ -184,10 +184,10 @@ class SuspendMonitorAdapter(QObject, BaseAdapterInterface):
         """
         :return: Studentmain suspend state
         """
-        pid = self.logic.get_pid_form_process_name(Jiv_build_config.E_CLASSROOM_PROGRAM_NAME)
-        if pid is None:
+        pids = self.logic.get_pid_from_process_name(Jiv_build_config.E_CLASSROOM_PROGRAM_NAME)
+        if pids is None:
             return SuspendState.NOT_FOUND
-        if self.logic.is_suspended(pid):
+        if self.logic.is_suspended(pids):
             return SuspendState.SUSPENDED
         else:
             return SuspendState.RUNNING
@@ -281,11 +281,13 @@ class TerminateAdapter:
         self.run_task()
 
     def run_task(self):
-        pid = self.logic.get_pid_form_process_name(Jiv_build_config.E_CLASSROOM_PROGRAM_NAME)
-        if pid is None:
+        pids = self.logic.get_pid_from_process_name(Jiv_build_config.E_CLASSROOM_PROGRAM_NAME)
+        if pids is None:
             print(f'{Jiv_build_config.E_CLASSROOM_PROGRAM_NAME} not found')
             return
-        self.logic.terminate_process(pid)
+
+        for pid in pids:
+            self.logic.terminate_process(pid)
 
     def check_state(self):
         return self.logic.get_process_state(Jiv_build_config.E_CLASSROOM_PROGRAM_NAME)
@@ -306,11 +308,15 @@ class SuspendStudentmainAdapter:
         self.logic = logic
 
     def start(self):
-        pid = self.logic.get_pid_form_process_name(Jiv_build_config.E_CLASSROOM_PROGRAM_NAME)
+        pids = self.logic.get_pid_from_process_name(Jiv_build_config.E_CLASSROOM_PROGRAM_NAME)
 
-        if pid is None:
+        if pids is None:
             print(f'{Jiv_build_config.E_CLASSROOM_PROGRAM_NAME} not found')
             return
+
+        # Same logic as the earlier method, may cause bug
+        # If a process's name is studentmain, but it's not the real one, this can suspend the wrong process
+        pid = pids[0]
 
         suspend_state = self.logic.is_suspended(pid)
         if suspend_state:
