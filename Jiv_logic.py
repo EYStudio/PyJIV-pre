@@ -383,6 +383,9 @@ class JIVLogic:
     # else:
     #     print("Failed to open process")
 
+    def nt_terminate_process(self, pid):
+        self.nt_terminate_process.terminate(pid)
+
     # # load ntdll.dll
     # ntdll = ctypes.WinDLL("ntdll")
     #
