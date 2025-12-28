@@ -1,8 +1,8 @@
 import ctypes
+import ctypes.wintypes as wintypes
 import os
 import platform
 import re
-# import ctypes.wintypes as wintypes
 import subprocess
 import sys
 import time
@@ -30,6 +30,8 @@ class JIVLogic:
         self.studentmain_path = None
         self.config = config
 
+        self.nt_terminate_process = None
+
         self.preparation()
 
     def preparation(self):
@@ -50,6 +52,8 @@ class JIVLogic:
         self.studentmain_directory = self.read_registry_value(key_path, value_name)
         self.studentmain_path = os.path.join(self.studentmain_directory, "studentmain.exe")
         print(self.studentmain_path)
+
+        self.nt_terminate_process = NativeTerminator()
 
     @staticmethod
     def check_operate_system():
@@ -333,6 +337,7 @@ class JIVLogic:
 
         # noinspection PyUnresolvedReferences
         win32api.TerminateProcess(h_process, 1)  # return code 1
+
         # if not success:
         # noinspection PyUnresolvedReferences
         # raise Exception(f"TerminateProcess failed, error={win32api.GetLastError()}")
@@ -383,8 +388,8 @@ class JIVLogic:
     #
     # # Define NtTerminateProcess function Prototype
     # NtTerminateProcess = ntdll.NtTerminateProcess
-    # NtTerminateProcess.argtypes = [wintypes.HANDLE, wintypes.NTSTATUS]
-    # NtTerminateProcess.restype = wintypes.NTSTATUS
+    # NtTerminateProcess.argtypes = [wintypes.HANDLE, NTSTATUS]
+    # NtTerminateProcess.restype = NTSTATUS
     #
     # # load kernel32.dll to open process
     # kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -599,6 +604,58 @@ class JIVLogic:
             winreg.CloseKey(base_key)
 
         return success_flag
+
+
+class NativeTerminator:
+    PROCESS_TERMINATE = 0x0001
+    NTSTATUS = wintypes.LONG
+
+    def __init__(self):
+        self.ntdll = ctypes.WinDLL("ntdll")
+        self.kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+
+        self.NtTerminateProcess = self.ntdll.NtTerminateProcess
+        self.NtTerminateProcess.argtypes = [wintypes.HANDLE, self.NTSTATUS]
+        self.NtTerminateProcess.restype = self.NTSTATUS
+
+        self.RtlNtStatusToDosError = self.ntdll.RtlNtStatusToDosError
+        self.RtlNtStatusToDosError.argtypes = [self.NTSTATUS]
+        self.RtlNtStatusToDosError.restype = wintypes.DWORD
+
+        self.OpenProcess = self.kernel32.OpenProcess
+        self.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        self.OpenProcess.restype = wintypes.HANDLE
+
+        self.CloseHandle = self.kernel32.CloseHandle
+        self.CloseHandle.argtypes = [wintypes.HANDLE]
+        self.CloseHandle.restype = wintypes.BOOL
+
+    @staticmethod
+    def win_error():
+        err = ctypes.get_last_error()
+        msg = ctypes.FormatError(err)
+        return err, msg
+
+    def terminate(self, pid, exit_code=1):
+        h_process = self.OpenProcess(self.PROCESS_TERMINATE, False, pid)
+        if not h_process:
+            err, msg = self.win_error()
+            raise RuntimeError(f"OpenProcess failed: {err} ({msg})")
+
+        status = self.NtTerminateProcess(h_process, exit_code)
+
+        self.CloseHandle(h_process)
+
+        if status != 0:
+            win32_err = self.RtlNtStatusToDosError(status)
+            raise RuntimeError(
+                f"NtTerminateProcess failed: NTSTATUS=0x{status:08X}, "
+                f"Win32Error={win32_err}"
+            )
+        else:
+            print(f"NTSTATUS = 0x{status:08X}")
+
+        return True
 
 # self.floatwin.setText(
 #     f"窗口标题：{GetWindowText(hwnd)}\n窗口类名：{GetClassName(hwnd)}\n窗口位置：{str(GetWindowRect(hwnd))}\n窗口句柄：{int(hwnd)}\n窗口进程：{procname}")
