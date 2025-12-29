@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QGridLayout, QVBoxLayout, QHBoxLayout, \
-    QSizePolicy, QStackedWidget, QLayout, QButtonGroup
+    QSizePolicy, QStackedWidget, QLayout, QButtonGroup, QRadioButton
 
 from Jiv_enmus import SuspendState, UpdateState
 
@@ -143,9 +143,9 @@ class MainWidget(QWidget):
 
         # Stack pages
         self.pages = QStackedWidget()
-        self.toolkit_page = ToolkitPage()
+        self.toolkit_page = ToolPage()
         self.pages.addWidget(self.toolkit_page)
-        self.settings_page = PageUpdating()
+        self.settings_page = SettingsPage()
         self.pages.addWidget(self.settings_page)
         self.update_page = UpdatePage()
         self.pages.addWidget(self.update_page)
@@ -203,7 +203,7 @@ class MainWidget(QWidget):
             """)
 
 
-class ToolkitPage(QWidget):
+class ToolPage(QWidget):
     ui_change = Signal(str, object)
 
     def __init__(self):
@@ -343,6 +343,62 @@ class ToolkitPage(QWidget):
 
     def clean_ifeo_debuggers(self):
         self.adapter.clean_ifeo_debuggers()
+
+
+class SettingsPage(QWidget):
+    ui_change = Signal(str, object)
+
+    def __init__(self):
+        super().__init__()
+        self.adapter = None
+        self.init_ui()
+
+    def init_ui(self):
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(3, 3, 3, 3)
+        main_layout.setSpacing(5)
+
+        self.terminate_options = QWidget()
+        self.terminate_options.setObjectName("terminate_options_frame")
+
+        self.terminate_options.setStyleSheet("""
+                    #terminate_options_frame {
+                        background-color: #eeeeee; 
+                        border-radius: 10px;
+                        font-size: 24px;
+                        border: 4px solid #cccccc;
+                        color: #455A64;   
+                    }
+                    
+                    QRadioButton {
+                        font-size: 16px;
+                    }
+                    QRadioButton::indicator {
+                        width: 24px;
+                        height: 24px;
+                    }
+                """)
+
+        terminate_options_frame_layout = QVBoxLayout(self.terminate_options)
+        terminate_options_frame_layout.setContentsMargins(5, 5, 5, 5)
+        terminate_options_frame_layout.setSpacing(5)
+
+        label_terminate_options = QLabel()
+        label_terminate_options.setStyleSheet("""
+                                            background-color: #eeeeee; 
+                                            border-radius: 10px;
+                                            font-size: 22px;
+                                            color: #455A64;   
+                                            """)
+        label_terminate_options.setText(f'Terminate options')
+        label_terminate_options.setFixedHeight(35)
+
+        terminate_options_frame_layout.addWidget(label_terminate_options)
+
+
+        main_layout.addWidget(self.terminate_options)
+
+        self.setLayout(main_layout)
 
 
 class UpdatePage(QWidget):
